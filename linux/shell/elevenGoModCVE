@@ -1,0 +1,14 @@
+#!/bin/sh
+  GO_MOD="${PWD}/go.mod"
+  if [ -f ${GO_MOD} ]; then
+    for GoCVE in "$@"; do
+      DETAILS=$(echo "${GoCVE}" | tr "|" "\n")
+      MOD=$(echo "${DETAILS}" | sed '1!d')
+      FIX=$(echo "${DETAILS}" | sed '2!d')
+      CVE=$(echo "${DETAILS}" | sed '3!d')
+      sed -i 's#'${MOD}' .\+[0-9]\+#'${MOD}' '${FIX}'#g' ${GO_MOD}
+      if [ $? ]; then
+        echo "fixing ${CVE} for module ${MOD} in ${GO_MOD}"
+      fi
+    done
+  fi
